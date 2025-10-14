@@ -34,7 +34,7 @@ export default function CheckoutPageContent() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'razorpay' | 'cod'>('razorpay');
   const [shippingAddress, setShippingAddress] = useState<ShippingAddress>({
-    fullName: userData?.fullName || '',
+    fullName: userData?.name || '',
     phone: userData?.phone || '',
     email: userData?.email || '',
     address: '',
@@ -88,17 +88,12 @@ export default function CheckoutPageContent() {
   const total = subtotal + tax;
 
   const createOrder = async (paymentResult?: any) => {
-    if (!user) {
-      toast.error('Please login to place an order');
-      router.push('/login');
-      return;
-    }
     const orderData = {
-      userId: user?.uid || '',
-      userName: userData?.fullName,
+      userId: user.uid,
+      userName: userData?.name,
       userEmail: userData?.email,
       userPhone: userData?.phone,
-      items: cart?.items ?? [],
+      items: cart.items,
       subtotal,
       tax,
       total,
@@ -135,11 +130,7 @@ export default function CheckoutPageContent() {
           razorpay_signature: 'demo_signature',
         };
 
-        const result = await createOrder(demoPaymentResult);
-        if (!result) {
-          throw new Error('Failed to create order');
-        }
-        const { orderId, orderNumber } = result;
+        const { orderId, orderNumber } = await createOrder(demoPaymentResult);
         clearCart();
         toast.success('Order placed successfully! (Demo Mode)');
         router.push(`/order-confirmation/${orderId}?orderNumber=${orderNumber}`);
@@ -150,7 +141,7 @@ export default function CheckoutPageContent() {
         amount: total,
         currency: 'INR',
         name: 'Product Order',
-        description: `Order for ${cart?.items?.length || 0} items`,
+        description: `Order for ${cart.items.length} items`,
         prefill: {
           name: shippingAddress.fullName,
           email: shippingAddress.email,
@@ -159,16 +150,12 @@ export default function CheckoutPageContent() {
         notes: {
           userId: user.uid,
           type: 'product_order',
-          itemCount: (cart?.items?.length || 0).toString()
+          itemCount: cart.items.length.toString()
         }
       });
 
-      if (PaymentRequest) {
-        const result = await createOrder(PaymentRequest);
-        if (!result) {
-          throw new Error('Failed to create order');
-        }
-        const { orderId, orderNumber } = result;
+      if (paymentResult) {
+        const { orderId, orderNumber } = await createOrder(paymentResult);
         clearCart();
         toast.success('Order placed successfully!');
         router.push(`/order-confirmation/${orderId}?orderNumber=${orderNumber}`);
@@ -194,11 +181,7 @@ export default function CheckoutPageContent() {
 
     try {
       setIsProcessing(true);
-      const result = await createOrder();
-      if (!result) {
-        throw new Error('Failed to create order');
-      }
-      const { orderId, orderNumber } = result;
+      const { orderId, orderNumber } = await createOrder();
       clearCart();
       toast.success('Order placed successfully!');
       router.push(`/order-confirmation/${orderId}?orderNumber=${orderNumber}`);
@@ -451,7 +434,7 @@ export default function CheckoutPageContent() {
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3">
                     <a
-                      href={`https://wa.me/918824187767?text=Hi, I want to pay ₹${total} for my order with ${cart?.items?.length ?? 0} items`}
+                      href={`https://wa.me/918824187767?text=Hi, I want to pay ₹${total} for my order with ${cart.items.length} items`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
