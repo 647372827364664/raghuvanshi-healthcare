@@ -1,18 +1,14 @@
 'use client';
 
-import { useCart } from '@/contexts/CartContext';
-import { useAuth } from '@/contexts/AuthContext';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { addDoc, collection } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { CreditCard, MapPin, User, Phone, Mail, ShoppingBag, Lock, Shield, Wallet, ArrowLeft } from 'lucide-react';
-import toast from 'react-hot-toast';
-import { useRazorpay } from '@/hooks/useRazorpay';
-import Image from 'next/image';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-import Button from '@/components/ui/Button';
+import dynamic from 'next/dynamic';
+
+const CheckoutContent = dynamic(() => import('./page-static'), {
+  ssr: false,
+});
+
+export default function CheckoutPage() {
+  return <CheckoutContent />;
+}
 
 interface ShippingAddress {
   fullName: string;

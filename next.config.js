@@ -1,9 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
-  trailingSlash: true,
-  skipTrailingSlashRedirect: true,
-  distDir: 'out',
+  basePath: '/raghuvanshi-healthcare',
+  assetPrefix: '/raghuvanshi-healthcare/',
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -12,7 +11,39 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
-    domains: ['firebasestorage.googleapis.com', 'images.unsplash.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+    ],
+  },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        crypto: false,
+        encoding: false,
+      };
+    }
+    config.module.rules.push({
+      test: /\.m?js$/,
+      type: 'javascript/auto',
+      resolve: {
+        fullySpecified: false,
+      },
+    });
+    return config;
+  },
+  experimental: {
+    serverComponentsExternalPackages: ['firebase', 'firebase-admin'],
   },
 };
 
