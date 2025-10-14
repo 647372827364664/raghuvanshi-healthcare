@@ -32,6 +32,12 @@ jobs:
         NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
         NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
         NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
+
+    - name: Copy static files
+      run: |
+        mkdir -p out
+        cp index.html out/
+        cp public/404.html out/
         
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
