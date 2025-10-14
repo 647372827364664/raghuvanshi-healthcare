@@ -1,14 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
-  basePath: '/raghuvanshi-healthcare',
-  assetPrefix: '/raghuvanshi-healthcare/',
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH || '/raghuvanshi-healthcare',
+  assetPrefix: process.env.NEXT_PUBLIC_BASE_PATH || '/raghuvanshi-healthcare',
   images: {
     unoptimized: true,
     remotePatterns: [
@@ -22,6 +16,12 @@ const nextConfig = {
       },
     ],
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -33,18 +33,9 @@ const nextConfig = {
         encoding: false,
       };
     }
-    config.module.rules.push({
-      test: /\.m?js$/,
-      type: 'javascript/auto',
-      resolve: {
-        fullySpecified: false,
-      },
-    });
     return config;
   },
-  experimental: {
-    serverComponentsExternalPackages: ['firebase', 'firebase-admin'],
-  },
+  trailingSlash: true,
 };
 
 module.exports = nextConfig;
