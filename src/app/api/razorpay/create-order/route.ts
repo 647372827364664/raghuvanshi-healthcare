@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getRazorpayClient } from '@/lib/razorpay';
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,19 +19,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if Razorpay keys are available
-    const hasRazorpayKeys = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET;
-    console.log('Razorpay keys available:', hasRazorpayKeys);
-
-    if (hasRazorpayKeys) {
-      // Try to use actual Razorpay
+    // Attempt to create a Razorpay client at runtime
+    const client = getRazorpayClient();
+    if (client) {
       try {
-        const Razorpay = require('razorpay');
-        const razorpay = new Razorpay({
-          key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-          key_secret: process.env.RAZORPAY_KEY_SECRET,
-        });
-
         const options = {
           amount: Math.round(amount * 100), // Convert to paise
           currency,
@@ -39,7 +31,7 @@ export async function POST(request: NextRequest) {
         };
 
         console.log('Creating Razorpay order with options:', options);
-        const order = await razorpay.orders.create(options);
+        const order = await client.orders.create(options);
         console.log('Razorpay order created successfully:', order);
         
         return NextResponse.json(order, { status: 200 });
@@ -50,6 +42,8 @@ export async function POST(request: NextRequest) {
         // Fall back to mock order if Razorpay fails
         console.log('Falling back to mock order creation');
       }
+    } else {
+      console.log('Razorpay client not available; using mock order');
     }
 
     // Create mock order (fallback when Razorpay is not available or fails)
