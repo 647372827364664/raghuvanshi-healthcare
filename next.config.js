@@ -1,8 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
-  basePath: process.env.NEXT_PUBLIC_BASE_PATH || '/raghuvanshi-healthcare',
-  assetPrefix: process.env.NEXT_PUBLIC_BASE_PATH || '/raghuvanshi-healthcare',
   images: {
     unoptimized: true,
     remotePatterns: [
@@ -35,7 +32,6 @@ const nextConfig = {
     }
     return config;
   },
-  trailingSlash: true,
 };
 
 module.exports = nextConfig;
