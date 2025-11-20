@@ -1,11 +1,5 @@
-import Razorpay from 'razorpay';
 import { NextRequest, NextResponse } from 'next/server';
-
-// Initialize Razorpay instance with direct environment variables
-const razorpay = new Razorpay({
-  key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
-  key_secret: process.env.RAZORPAY_KEY_SECRET!,
-});
+import { getRazorpayClient } from '@/lib/razorpay';
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,11 +18,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate Razorpay keys
-    if (!process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-      console.error('Razorpay keys not found in environment variables');
+    // Attempt to construct Razorpay client at runtime
+    const client = getRazorpayClient();
+
+    if (!client) {
+      console.error('Razorpay client could not be created – missing credentials');
       return NextResponse.json(
-        { error: 'Payment gateway configuration error' },
+        { error: 'Payment gateway configuration error: missing API keys' },
         { status: 500 }
       );
     }
@@ -42,7 +38,7 @@ export async function POST(request: NextRequest) {
     };
 
     // Create order using Razorpay API
-    const order = await razorpay.orders.create(options);
+    const order = await client.orders.create(options);
 
     return NextResponse.json({
       success: true,
