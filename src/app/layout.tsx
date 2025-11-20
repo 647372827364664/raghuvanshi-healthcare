@@ -1,21 +1,13 @@
 import type { Metadata } from 'next';
-import { Inter, Poppins } from 'next/font/google';
+// Removed `next/font/google` imports to avoid build-time font fetching failures
+// We'll load fonts via a runtime <link> so remote builders don't need to fetch
 import './globals.css';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { CartProvider } from '@/contexts/CartContext';
 import { Toaster } from 'react-hot-toast';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 
-const inter = Inter({ 
-  subsets: ['latin'],
-  variable: '--font-inter',
-});
-
-const poppins = Poppins({ 
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700', '800'],
-  variable: '--font-poppins',
-});
+// Using runtime font loading via Google Fonts <link> to avoid build-time network issues
 
 export const metadata: Metadata = {
   title: {
@@ -94,14 +86,19 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <head>
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+          {/* Load fonts at runtime instead of build-time to avoid remote builder timeouts */}
+          <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap"
+            rel="stylesheet"
+          />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
         <meta name="theme-color" content="#004AAD" />
         <link rel="preload" href="/images/hero-bg.jpg" as="image" />
       </head>
-      <body className={`${inter.variable} ${poppins.variable} font-sans antialiased`}>
+        <body className={`font-sans antialiased`}>
         <ThemeProvider>
           <AuthProvider>
             <CartProvider>
